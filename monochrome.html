@@ -1,0 +1,272 @@
+  <!DOCTYPE html>
+  <html lang="en">
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="monochrome.css">
+
+    </head>
+    <body class="max-w-4xl mx-auto">
+    <h1>Monochrome</h1>
+    <div class="flex flex-col justify-center px-4 pt-12">
+      <div class="mb-4 flex flex-col gap-2">
+        <div class="button" id="red">
+          <button id="redbutton" onclick="toggleSelection(this)">Red</button>
+        </div>
+
+        <div class="button" id="orange">
+          <button id="orangebutton" onclick="toggleSelection(this)">Orange</button>
+        </div>
+
+        <div class="button" id="yellow">
+          <button id="yellowbutton" onclick="toggleSelection(this)">Yellow</button>
+        </div>
+
+        <div class="button" id="green">
+          <button id="greenbutton" onclick="toggleSelection(this)">Green</button>
+        </div>
+
+        <div class="button" id="blue">
+          <button id="bluebutton" onclick="toggleSelection(this)">Blue</button>
+        </div>
+        
+        <div class="button" id="purple">
+          <button id="purplebutton" onclick="toggleSelection(this)">Purple</button>
+        </div>
+        <br><br>
+        <label for="numImagesSelect">Number of Images</label>
+        <select id="numImagesSelect" class="input-style"></select>
+      </div>
+      <div class="mt-2 text-right">
+        <button id="btn" class="button-style">Generate</button>
+      </div>
+      <div id="loading" class="hidden" style="display: flex; justify-content: center; align-items: center; margin-top: 2.5rem;">
+
+      </div>
+      <div id="image" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-10"></div>
+    </div>
+
+    <script>
+      let image_description="monochrome ";
+      let blue_selected = 0;
+      let green_selected = 0;
+      let yellow_selected = 0;
+      let orange_selected = 0;
+      let red_selected = 0;
+      let purple_selected = 0;
+    
+      function toggleSelection(button) {
+        button.classList.toggle('selected');
+
+        switch (button.id) {
+          case 'redbutton':
+            checkredSelected();
+            break;
+          case 'orangebutton':
+            checkorangeSelected();
+            break;
+          case 'yellowbutton':
+            checkyellowSelected();
+            break;
+          case 'greenbutton':
+            checkgreenelected();
+            break;
+          case 'bluebutton':
+            checkblueSelected();
+            break;
+           case 'purplebutton':
+            checkpurpleSelected();
+            break;
+        }
+      }
+
+      function checkredSelected() {
+        let redButton = document.getElementById("redbutton");
+        if (redButton.classList.contains('selected') && red_selected == 0) {
+          red_selected = 1;
+          image_description = image_description + "red ";
+          alert(image_description);
+        }
+        else{
+          image_description = image_description.replace("red ", "");
+          red_selected = 0;
+          alert(image_description);
+        }
+      }
+
+      function checkorangeSelected() {
+        let orangeButton = document.getElementById("orangebutton");
+        if (orangeButton.classList.contains('selected') && orange_selected == 0) {
+          orange_selected = 1;
+          image_description = image_description + "orange ";
+          alert(image_description);
+        }
+        else{
+          image_description = image_description.replace("orange ", "");
+          orange_selected = 0;
+          alert(image_description);
+        }
+      }
+
+      function checkyellowSelected() {
+        let yellowButton = document.getElementById("yellowbutton");
+        if (yellowButton.classList.contains('selected') && yellow_selected == 0) {
+          yellow_selected = 1;
+          image_description = image_description + "yellow ";
+          alert(image_description);
+        }
+        else{
+          image_description = image_description.replace("yellow ", "");
+          yellow_selected = 0;
+          alert(image_description);
+        }
+      }
+
+      function checkgreenelected() {
+        let landscapeButton = document.getElementById("greenbutton");
+        if (landscapeButton.classList.contains('selected') && landscape_selected == 0) {
+          landscape_selected = 1;
+          image_description = image_description + "green ";
+          alert(image_description);
+        }
+        else{
+          image_description = image_description.replace("green ", "");
+          landscape_selected = 0;
+          alert(image_description);
+        }
+      }
+
+      function checkblueSelected() {
+        let blueButton = document.getElementById("bluebutton");
+        if (blueButton.classList.contains('selected') && blue_selected == 0) {
+          blue_selected = 1;
+          image_description = image_description + "blue ";
+          alert(image_description);
+        }
+        else{
+          image_description = image_description.replace("blue ", "");
+          blue_selected = 0;
+          alert(image_description);
+        }
+      }
+      
+      function checkpurpleSelected() {
+        let purpleButton = document.getElementById("purplebutton");
+        if (purpleButton.classList.contains('selected') && purple_selected == 0) {
+          purple_selected = 1;
+          image_description = image_description + "purple ";
+          alert(image_description);
+        }
+        else{
+          image_description = image_description.replace("purple ", "");
+          purple_selected = 0;
+          alert(image_description);
+        }
+      }
+
+      const url = "https://api.openai.com/v1/images/generations";
+      const image = document.getElementById("image");
+      const btn = document.getElementById("btn");
+      const numImagesSelect = document.getElementById("numImagesSelect");
+      const loadingSpinner = document.getElementById("loading");
+      const apiDiv = document.getElementsByClassName("apiDiv");
+      const apiInput = document.getElementById("api");
+
+      const optionsFragment = document.createDocumentFragment();
+
+      for (let i = 1; i <= 10; i++) {
+        const option = document.createElement("option");
+        option.value = i;
+        option.textContent = i;
+        numImagesSelect.appendChild(option);
+      }
+
+      let numImages = parseInt(numImagesSelect.value);
+      let apiKey = "YOUR_OPENAI_API_KEY";
+
+      function generateImage() {
+      if (image_description === "") {
+          alert("Please select at least one category");
+          return;
+        }
+
+        loadingSpinner.classList.remove("hidden");
+        btn.disabled = true;
+        btn.textContent = "Generating...";
+
+        const data = {
+          prompt: image_description,
+          n: numImages,
+          size: `256x256`,
+        };
+
+        fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + apiKey,
+          },
+          body: JSON.stringify(data),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            console.log(data);
+            loadingSpinner.classList.add("hidden");
+            btn.disabled = false;
+            btn.textContent = "Generate";
+
+            data.data.forEach((item) => {
+              const img = document.createElement("img");
+              img.src = item.url;
+              img.alt = "image";
+              img.classList.add(
+                "w-full",
+                "h-auto",
+                "rounded-lg",
+                "shadow-lg",
+                "hover:shadow-2xl",
+                "transition",
+                "duration-500",
+                "ease-in-out",
+                "transform",
+                "hover:-translate-y-1",
+                "hover:scale-103"
+              );
+
+              image.appendChild(img);
+
+              // Double-click event listener
+              img.addEventListener("dblclick", () => {
+                downloadImage(item.url);
+              });
+            });
+          })
+          .catch((err) => {
+            console.log(err);
+            loadingSpinner.classList.add("hidden");
+            btn.disabled = false;
+            btn.textContent = "Generate";
+            alert("Something went wrong. Please try again.");
+          });
+      }
+
+      numImagesSelect.addEventListener("change", function () {
+        numImages = parseInt(numImagesSelect.value);
+      });
+
+      btn.addEventListener("click", generateImage);
+
+      function downloadImage(url) {
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = image_description.split(" ").join("_") + ".png";
+        link.target = "_blank";
+        link.click();
+      }
+    </script>
+  </body>
+  </html>

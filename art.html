@@ -1,0 +1,250 @@
+  <!DOCTYPE html>
+  <html lang="en">
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="art.css">
+
+    </head>
+    <body class="max-w-4xl mx-auto">
+    <h1>Art</h1>
+    <div class="flex flex-col justify-center px-4 pt-12">
+      <div class="mb-4 flex flex-col gap-2">
+        <div class="button" id="shapes">
+          <button id="shapesbutton" onclick="toggleSelection(this)">Shapes</button>
+        </div>
+
+        <div class="button" id="architecture">
+          <button id="architecturebutton" onclick="toggleSelection(this)">Architecture</button>
+        </div>
+
+        <div class="button" id="renaissance">
+          <button id="renaissancebutton" onclick="toggleSelection(this)">Renaissance</button>
+        </div>
+
+        <div class="button" id="sculptures">
+          <button id="sculpturesbutton" onclick="toggleSelection(this)">Sculptures</button>
+        </div>
+
+        <div class="button" id="popart">
+          <button id="popartbutton" onclick="toggleSelection(this)">Pop Art</button>
+        </div>
+        <br><br>
+        <label for="numImagesSelect">Number of Images</label>
+        <select id="numImagesSelect" class="input-style"></select>
+      </div>
+      <div class="mt-2 text-right">
+        <button id="btn" class="button-style">Generate</button>
+      </div>
+      <div id="loading" class="hidden" style="display: flex; justify-content: center; align-items: center; margin-top: 2.5rem;">
+
+      </div>
+      <div id="image" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-10"></div>
+    </div>
+
+    <script>
+      let image_description='';
+      let shapes_selected = 0;
+      let architecture_selected = 0;
+      let renaissance_selected = 0;
+      let sculptures_selected = 0;
+      let popart_selected = 0;
+
+      function toggleSelection(button) {
+        button.classList.toggle('selected');
+
+        switch (button.id) {
+          case 'shapesbutton':
+            checkshapesSelected();
+            break;
+          case 'architecturebutton':
+            checkarchitectureSelected();
+            break;
+          case 'renaissancebutton':
+            checkrenaissanceSelected();
+            break;
+          case 'sculpturesbutton':
+            checksculpturesSelected();
+            break;
+          case 'popartbutton':
+            checkpopartSelected();
+            break;
+        }
+      }
+
+      function checkshapesSelected() {
+        let shapesButton = document.getElementById("shapesbutton");
+        if (shapesButton.classList.contains('selected') && shapes_selected == 0) {
+          shapes_selected = 1;
+          image_description = image_description + "shapes ";
+          alert(image_description);
+        }
+        else{
+          image_description = image_description.replace("shapes ", "");
+          shapes_selected = 0;
+          alert(image_description);
+        }
+      }
+
+      function checkarchitectureSelected() {
+        let architectureButton = document.getElementById("architecturebutton");
+        if (architectureButton.classList.contains('selected') && architecture_selected == 0) {
+          architecture_selected = 1;
+          image_description = image_description + "architecture ";
+          alert(image_description);
+        }
+        else{
+          image_description = image_description.replace("architecture ", "");
+          architecture_selected = 0;
+          alert(image_description);
+        }
+      }
+
+      function checkrenaissanceSelected() {
+        let renaissanceButton = document.getElementById("renaissancebutton");
+        if (renaissanceButton.classList.contains('selected') && renaissance_selected == 0) {
+          renaissance_selected = 1;
+          image_description = image_description + "renaissance ";
+          alert(image_description);
+        }
+        else{
+          image_description = image_description.replace("renaissance ", "");
+          renaissance_selected = 0;
+          alert(image_description);
+        }
+      }
+
+      function checksculpturesSelected() {
+        let sculpturesButton = document.getElementById("sculpturessbutton");
+        if (sculpturesButton.classList.contains('selected') && sculptures_selected == 0) {
+          sculptures_selected = 1;
+          image_description = image_description + "sculpturess ";
+          alert(image_description);
+        }
+        else{
+          image_description = image_description.replace("sculpturess ", "");
+          sculptures_selected = 0;
+          alert(image_description);
+        }
+      }
+
+      function checkpopartSelected() {
+        let popartButton = document.getElementById("popartbutton");
+        if (popartButton.classList.contains('selected') && popart_selected == 0) {
+          popart_selected = 1;
+          image_description = image_description + "pop art ";
+          alert(image_description);
+        }
+        else{
+          image_description = image_description.replace("pop art ", "");
+          popart_selected = 0;
+          alert(image_description);
+        }
+      }
+
+      const url = "https://api.openai.com/v1/images/generations";
+      const image = document.getElementById("image");
+      const btn = document.getElementById("btn");
+      const numImagesSelect = document.getElementById("numImagesSelect");
+      const loadingSpinner = document.getElementById("loading");
+      const apiDiv = document.getElementsByClassName("apiDiv");
+      const apiInput = document.getElementById("api");
+
+      const optionsFragment = document.createDocumentFragment();
+
+      for (let i = 1; i <= 10; i++) {
+        const option = document.createElement("option");
+        option.value = i;
+        option.textContent = i;
+        numImagesSelect.appendChild(option);
+      }
+
+      let numImages = parseInt(numImagesSelect.value);
+      let apiKey = "YOUR_OPENAI_API_KEY";
+
+      function generateImage() {
+      if (image_description === "") {
+          alert("Please select at least one category");
+          return;
+        }
+
+        loadingSpinner.classList.remove("hidden");
+        btn.disabled = true;
+        btn.textContent = "Generating...";
+
+        const data = {
+          prompt: image_description,
+          n: numImages,
+          size: `256x256`,
+        };
+
+        fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + apiKey,
+          },
+          body: JSON.stringify(data),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            console.log(data);
+            loadingSpinner.classList.add("hidden");
+            btn.disabled = false;
+            btn.textContent = "Generate";
+
+            data.data.forEach((item) => {
+              const img = document.createElement("img");
+              img.src = item.url;
+              img.alt = "image";
+              img.classList.add(
+                "w-full",
+                "h-auto",
+                "rounded-lg",
+                "shadow-lg",
+                "hover:shadow-2xl",
+                "transition",
+                "duration-500",
+                "ease-in-out",
+                "transform",
+                "hover:-translate-y-1",
+                "hover:scale-103"
+              );
+
+              image.appendChild(img);
+
+              // Double-click event listener
+              img.addEventListener("dblclick", () => {
+                downloadImage(item.url);
+              });
+            });
+          })
+          .catch((err) => {
+            console.log(err);
+            loadingSpinner.classList.add("hidden");
+            btn.disabled = false;
+            btn.textContent = "Generate";
+            alert("Something went wrong. Please try again.");
+          });
+      }
+
+      numImagesSelect.addEventListener("change", function () {
+        numImages = parseInt(numImagesSelect.value);
+      });
+
+      btn.addEventListener("click", generateImage);
+
+      function downloadImage(url) {
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = image_description.split(" ").join("_") + ".png";
+        link.target = "_blank";
+        link.click();
+      }
+    </script>
+  </body>
+  </html>

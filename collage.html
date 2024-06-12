@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>replit</title>
+  <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
+  <link href="sports.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body class="max-w-4xl mx-auto">
+  <h1>Collage</h1>
+  <div class="flex flex-col justify-center px-4 pt-12">
+    <div class="mb-4 flex flex-col gap-2">
+      <label for="text" class="text-gray-600">Description or Keyword</label>
+      <textarea class="buttons" id="text"name="myTextBox" cols="50" rows="5" style="border:3px double black;">
+      </textarea>
+      <br><br>
+      <label for="numImagesSelect">Number of Images</label>
+      <select id="numImagesSelect" class="input-style"></select>
+    </div>
+    <div class="mt-2 text-right">
+      <button id="btn" class="button-style">Generate</button>
+    </div>
+    <div id="loading" class="hidden" style="display: flex; justify-content: center; align-items: center; margin-top: 2.5rem;"></div>
+    <div id="image" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-10"></div>
+  </div>
+  <script>
+    const url = "https://api.openai.com/v1/images/generations";
+
+    const text = document.getElementById("text");
+    const image = document.getElementById("image");
+    const btn = document.getElementById("btn");
+    const numImagesSelect = document.getElementById("numImagesSelect");
+    const loadingSpinner = document.getElementById("loading");
+    const apiKey = "YOUR_API_KEY";
+
+    const optionsFragment = document.createDocumentFragment();
+
+    for (let i = 1; i <= 10; i++) {
+      const option = document.createElement("option");
+      option.value = i;
+      option.textContent = i;
+      numImagesSelect.appendChild(option);
+    }
+
+    let numImages = parseInt(numImagesSelect.value);
+
+    function generateImage() {
+      if (text.value === "") {
+        alert("Please enter a value");
+        return;
+      }
+
+      loadingSpinner.classList.remove("hidden");
+      btn.disabled = true;
+      btn.textContent = "Generating..."; // Update button text to "Generating"
+
+      const data = {
+        prompt: text.value,
+        n: numImages,
+        size: `256x256`,
+      };
+
+      fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + apiKey,
+        },
+        body: JSON.stringify(data),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data);
+          loadingSpinner.classList.add("hidden");
+          btn.disabled = false;
+          btn.textContent = "Generate"; // Revert button text back to "Generate"
+
+          data.data.forEach((item) => {
+            const img = document.createElement("img");
+            img.src = item.url;
+            img.alt = "image";
+            img.classList.add(
+              "w-full",
+              "h-auto",
+              "rounded-lg",
+              "shadow-lg",
+              "hover:shadow-2xl",
+              "transition",
+              "duration-500",
+              "ease-in-out",
+              "transform",
+              "hover:-translate-y-1",
+              "hover:scale-103"
+            );
+
+            image.appendChild(img);
+
+            // Double-click event listener
+            img.addEventListener("dblclick", () => {
+              downloadImage(item.url);
+            });
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+          loadingSpinner.classList.add("hidden");
+          btn.disabled = false;
+          btn.textContent = "Generating..."; 
+          alert("Something went wrong. Please try again.");
+        });
+    }
+
+    numImagesSelect.addEventListener("change", function () {
+      numImages = parseInt(numImagesSelect.value);
+    });
+
+    btn.addEventListener("click", generateImage);
+
+    function downloadImage(url) {
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = text.value.split(" ").join("_") + ".png";
+      link.target = "_blank";
+      link.click();
+    }
+  </script>
+</body>
+
+</html>
